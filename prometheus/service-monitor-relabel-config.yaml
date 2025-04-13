@@ -1,0 +1,42 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: node-exporter
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 1.7.0
+  name: node-exporter
+  namespace: monitoring
+spec:
+  endpoints:
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    interval: 15s
+    port: https
+    relabelings:
+    - action: replace
+      regex: (.*)
+      replacement: $1
+      sourceLabels:
+      - __meta_kubernetes_pod_node_name
+      targetLabel: instance
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+    # 추가된 relabel_configs 예시
+    relabel_configs:
+    - sourceLabels: [__address__]      # 원본라벨
+      targetLabel: instance_address    # 최종라벨 
+    - targetLabel: __address__         # 원본라벨
+      replacement: 127.0.0.1:9090      # 고정라벨로 수정
+    # 추가된 metric_relabel_configs 예시
+    metric_relabel_configs:
+    - sourceLabels: [job]
+      regex: 'node-exporter'
+      action: drop
+  jobLabel: app.kubernetes.io/name
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: node-exporter
+      app.kubernetes.io/part-of: kube-prometheus
