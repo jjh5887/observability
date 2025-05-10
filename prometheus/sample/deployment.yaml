@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: sample-app
-          image: luxas/autoscale-demo:v0.1.2
+          image: fabxc/instrumented_app
           name: metrics-provider
           ports:
             - containerPort: 8080
