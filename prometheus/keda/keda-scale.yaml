@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: sample-app
+  namespace: monitoring
+spec: 
+  scaleTargetRef:       # 스케일링할 대상 리소스
+    kind: Deployment
+    name: sample-app
+  pollingInterval: 15   # 폴링 간격을 초 단위로 설정 (기본값은 30초)
+  cooldownPeriod:  30   # 스케일 다운 전 쿨다운 시간을 초 단위로 설정 (기본값은 300초)
+  minReplicaCount: 1    # 최소 Replica 수
+  maxReplicaCount: 5    # 최대 Replica 수
+  triggers:             # 트리거 조건 지정
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+        metricName: http_requests_total
+        threshold: '50'
+        query: sum(rate(http_requests_total{service="sample-app"}[2m]))

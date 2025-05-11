@@ -1,0 +1,19 @@
+# prometheus network policy에서 keda를 허용해줘야 함
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-keda-operator-to-prometheus
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: keda             # keda 네임스페이스에 이 레이블을 달아두셨다면
+      ports:
+        - protocol: TCP
+          port: 9090

@@ -1,6 +1,6 @@
   #!/bin/bash
 
-REPO_URL="https://github.com/prometheus-operator/kube-prometheus.git"
+REPO_URL=""
 DIR_NAME="kube-prometheus"
 
 if [ -d "$DIR_NAME/.git" ]; then
@@ -19,5 +19,11 @@ kubectl create -f manifests/setup
 kubectl create -f manifests
 
 kubectl get crd -n monitoring
+
+helm repo add kedacore https://kedacore.github.io/charts
+
+helm repo update
+
+helm install keda kedacore/keda --namespace keda --create-namespace
 
 kubectl -n monitoring port-forward svc/prometheus-k8s 9090
