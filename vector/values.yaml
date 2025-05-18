@@ -1,0 +1,23 @@
+# values.yaml
+role: "Agent"
+customConfig:
+  api:
+      enabled: true
+      address: 127.0.0.1:8686
+  sources:
+    demo_logs:
+      type: demo_logs
+      interval: 3
+      format: json
+
+  sinks:
+    loki:
+      type: loki
+      inputs:
+        - demo_logs
+      endpoint: "http://loki-gateway.loki.svc.cluster.local:80"
+      encoding:
+        codec: json
+      labels:
+        job: "vector"
+        host: "${HOSTNAME}"

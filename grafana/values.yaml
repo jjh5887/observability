@@ -1,0 +1,29 @@
+# grafana-values.yaml
+replicaCount: 1
+
+# Admin 계정
+adminUser: admin
+adminPassword: admin
+
+# Service 타입
+service:
+  type: LoadBalancer
+
+# Persistent Volume (로그·설정 유지가 필요하면 활성화)
+persistence:
+  enabled: true
+  size: 10Gi
+  accessModes:
+    - ReadWriteOnce
+
+# DataSource (Loki)
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki-gateway.loki.svc.cluster.local:80
+        isDefault: true
+        version: 1
