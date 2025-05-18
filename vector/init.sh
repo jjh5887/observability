@@ -5,7 +5,7 @@ helm repo add vector https://helm.vector.dev
 
 helm repo update
 
-helm install vector vector/vector \
+helm upgrade --install vector vector/vector \
   --namespace vector \
   --values values.yaml
 
