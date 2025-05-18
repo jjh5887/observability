@@ -1,5 +1,8 @@
 # values.yaml
-role: "Agent"
+role: "Aggregator"
+
+replicas: 5
+
 customConfig:
   api:
       enabled: true
@@ -7,17 +10,28 @@ customConfig:
   sources:
     demo_logs:
       type: demo_logs
-      interval: 3
+      interval: 0.001
       format: json
+
+  transforms:
+    parse_message:
+      type: remap
+      inputs: ["demo_logs"]
+      source: |
+        . = parse_json!(.message)
+        del(.message) 
 
   sinks:
     loki:
       type: loki
       inputs:
-        - demo_logs
+        - parse_message
       endpoint: "http://loki-gateway.loki.svc.cluster.local:80"
       encoding:
         codec: json
       labels:
-        job: "vector"
-        host: "${HOSTNAME}"
+        job:    "vector"
+        host:   "${HOSTNAME}"
+        method: "{{`{{ method }}`}}"
+        status: "{{`{{ status }}`}}"
+        user:   "{{`{{ user-identifier }}`}}"
